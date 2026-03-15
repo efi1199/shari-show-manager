@@ -14,6 +14,7 @@ export interface Client {
   name: string;
   phone: string;
   email?: string;
+  location?: string;
   status: ClientStatus;
   source: ClientSource;
   followUpDate?: string;

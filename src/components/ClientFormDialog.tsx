@@ -12,6 +12,7 @@ interface ClientFormData {
   name: string;
   phone: string;
   email: string;
+  location: string;
   status: ClientStatus;
   source: ClientSource;
   followUpDate: string;
@@ -31,6 +32,7 @@ export function ClientFormDialog({ open, onClose, onSave, editClient }: ClientFo
       name: '',
       phone: '',
       email: '',
+      location: '',
       status: 'lead',
       source: 'other',
       followUpDate: '',
@@ -43,6 +45,7 @@ export function ClientFormDialog({ open, onClose, onSave, editClient }: ClientFo
       setValue('name', editClient.name);
       setValue('phone', editClient.phone);
       setValue('email', editClient.email || '');
+      setValue('location', editClient.location || '');
       setValue('status', editClient.status);
       setValue('source', editClient.source);
       setValue('followUpDate', editClient.followUpDate || '');
@@ -82,6 +85,12 @@ export function ClientFormDialog({ open, onClose, onSave, editClient }: ClientFo
           <div className="space-y-2">
             <Label htmlFor="email">אימייל</Label>
             <Input id="email" {...register('email')} placeholder="email@example.com" type="email" />
+          </div>
+
+          {/* Location */}
+          <div className="space-y-2">
+            <Label htmlFor="location">מיקום / כתובת</Label>
+            <Input id="location" {...register('location')} placeholder='למשל: גן "שקד", רמת גן' />
           </div>
 
           {/* Status & Source */}

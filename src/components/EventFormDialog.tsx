@@ -80,10 +80,15 @@ export function EventFormDialog({ open, onClose, onSave, editEvent }: EventFormD
       ...prev,
       clientName: client.name,
       clientPhone: client.phone,
+      location: client.location || prev.location,
     }));
     setClientSearch(client.name);
     setClientDropdownOpen(false);
   };
+
+  // VAT calculation (17% in Israel)
+  const VAT_RATE = 0.17;
+  const priceWithVat = Math.round(form.price * (1 + VAT_RATE));
 
   const handleClientInputChange = (value: string) => {
     setClientSearch(value);
@@ -218,14 +223,20 @@ export function EventFormDialog({ open, onClose, onSave, editEvent }: EventFormD
             <Input value={form.location} onChange={e => update('location', e.target.value)} required />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-1.5">
+            <Label>מספר ילדים</Label>
+            <Input type="number" value={form.numberOfKids} onChange={e => update('numberOfKids', +e.target.value)} min={1} />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>מספר ילדים</Label>
-              <Input type="number" value={form.numberOfKids} onChange={e => update('numberOfKids', +e.target.value)} min={1} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>מחיר (₪)</Label>
+              <Label>מחיר (₪) <span className="text-xs text-muted-foreground">(לא כולל מע״מ)</span></Label>
               <Input type="number" value={form.price} onChange={e => update('price', +e.target.value)} min={0} />
+              {form.price > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  (כולל מע״מ 17%: <span className="font-medium text-foreground">₪{priceWithVat.toLocaleString()}</span>)
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label>מקדמה (₪)</Label>
