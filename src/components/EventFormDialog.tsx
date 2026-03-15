@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { EventOrder, EventType, InvoiceStatus, EVENT_TYPE_LABELS, SHOW_OPTIONS } from '@/types/event';
+import { EventOrder, EventType, ShowType, InvoiceStatus, EVENT_TYPE_LABELS, SHOW_TYPE_LABELS } from '@/types/event';
 import { useClients } from '@/hooks/useClients';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -22,14 +22,15 @@ const INITIAL: Omit<EventOrder, 'id' | 'createdAt'> = {
   clientPhone: '',
   eventDate: '',
   eventTime: '16:00',
-  eventType: 'birthday',
+  eventType: 'kindergarten',
   location: '',
   numberOfKids: 20,
   price: 1200,
   depositPaid: 0,
   invoiceStatus: 'not_sent',
   notes: '',
-  showName: SHOW_OPTIONS[0],
+  showType: 'show',
+  showName: '',
 };
 
 export function EventFormDialog({ open, onClose, onSave, editEvent }: EventFormDialogProps) {
@@ -42,7 +43,12 @@ export function EventFormDialog({ open, onClose, onSave, editEvent }: EventFormD
   useEffect(() => {
     if (editEvent) {
       const { id, createdAt, ...rest } = editEvent;
-      setForm(rest);
+      // Handle old events that don't have showType
+      const formData = {
+        ...rest,
+        showType: rest.showType || 'show',
+      };
+      setForm(formData);
       setClientSearch(rest.clientName);
     } else {
       setForm(INITIAL);
@@ -171,28 +177,39 @@ export function EventFormDialog({ open, onClose, onSave, editEvent }: EventFormD
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label>סוג אירוע</Label>
+            <Select value={form.eventType} onValueChange={v => update('eventType', v as EventType)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(EVENT_TYPE_LABELS).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Show Type and Name */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label>סוג אירוע</Label>
-              <Select value={form.eventType} onValueChange={v => update('eventType', v as EventType)}>
+              <Label>סוג הפעלה</Label>
+              <Select value={form.showType} onValueChange={v => update('showType', v as ShowType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {Object.entries(EVENT_TYPE_LABELS).map(([key, label]) => (
+                  {Object.entries(SHOW_TYPE_LABELS).map(([key, label]) => (
                     <SelectItem key={key} value={key}>{label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>הצגה</Label>
-              <Select value={form.showName} onValueChange={v => update('showName', v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {SHOW_OPTIONS.map(s => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>שם ה{SHOW_TYPE_LABELS[form.showType]}</Label>
+              <Input 
+                value={form.showName} 
+                onChange={e => update('showName', e.target.value)} 
+                placeholder={`לדוגמה: ${form.showType === 'show' ? 'הצגת בובות' : 'סדנת יצירה'}`}
+                required 
+              />
             </div>
           </div>
 

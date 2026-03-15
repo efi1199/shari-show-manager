@@ -1,4 +1,6 @@
-export type EventType = 'birthday' | 'kindergarten' | 'school' | 'holiday' | 'other';
+export type EventType = 'library' | 'kindergarten' | 'matnас' | 'other';
+
+export type ShowType = 'show' | 'workshop';
 
 export type InvoiceStatus = 'not_sent' | 'invoice_sent' | 'receipt_sent' | 'paid';
 
@@ -15,16 +17,21 @@ export interface EventOrder {
   depositPaid: number;
   invoiceStatus: InvoiceStatus;
   notes: string;
+  showType: ShowType;
   showName: string;
   createdAt: string;
 }
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  birthday: 'יום הולדת',
+  library: 'ספרייה',
   kindergarten: 'גן ילדים',
-  school: 'בית ספר',
-  holiday: 'חג / אירוע מיוחד',
+  matnас: 'מתנ"ס',
   other: 'אחר',
+};
+
+export const SHOW_TYPE_LABELS: Record<ShowType, string> = {
+  show: 'הצגה',
+  workshop: 'סדנה',
 };
 
 export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
@@ -33,11 +40,3 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
   receipt_sent: 'קבלה נשלחה',
   paid: 'שולם',
 };
-
-export const SHOW_OPTIONS = [
-  'הצגת בובות קלאסית',
-  'סיפורי קסם',
-  'הצגה אינטראקטיבית',
-  'סדנת בובות',
-  'הצגה מותאמת אישית',
-];

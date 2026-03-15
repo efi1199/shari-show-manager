@@ -1,4 +1,4 @@
-import { EventOrder, EVENT_TYPE_LABELS, INVOICE_STATUS_LABELS } from '@/types/event';
+import { EventOrder, EVENT_TYPE_LABELS, INVOICE_STATUS_LABELS, SHOW_TYPE_LABELS } from '@/types/event';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, MapPin, Users, Phone } from 'lucide-react';
@@ -43,7 +43,9 @@ export function EventCard({ event, onEdit, onDelete, onStatusChange, index }: Ev
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-bold text-lg text-foreground">{event.clientName}</h3>
-          <p className="text-sm text-muted-foreground">{event.showName}</p>
+          <p className="text-sm text-muted-foreground">
+            {event.showType ? SHOW_TYPE_LABELS[event.showType] : 'הצגה'}: {event.showName}
+          </p>
         </div>
         <div className="flex gap-1">
           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => onEdit(event)}>
