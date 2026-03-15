@@ -9,8 +9,8 @@ interface PasswordProtectionProps {
 }
 
 // Change this password to whatever you want!
-const SITE_PASSWORD = 'shari2026';
-const AUTH_KEY = 'shari_authenticated';
+const SITE_PASSWORD = 'SARI1987';
+const AUTH_KEY = 'sari_authenticated';
 
 export function PasswordProtection({ children }: PasswordProtectionProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
