@@ -75,7 +75,7 @@ function getSampleEvents(): EventOrder[] {
 export function useEvents() {
   const [events, setEvents] = useState<EventOrder[]>(loadEvents);
 
-  const addEvent = useCallback((event: Omit<EventOrder, 'id' | 'createdAt'>) => {
+  const addEvent = useCallback((event: Omit<EventOrder, 'id' | 'createdAt'>): EventOrder => {
     const newEvent: EventOrder = {
       ...event,
       id: crypto.randomUUID(),
@@ -86,6 +86,7 @@ export function useEvents() {
       saveEvents(updated);
       return updated;
     });
+    return newEvent;
   }, []);
 
   const updateEvent = useCallback((id: string, updates: Partial<EventOrder>) => {

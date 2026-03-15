@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useClients } from '@/hooks/useClients';
 import { ClientCard } from '@/components/ClientCard';
 import { ClientFormDialog } from '@/components/ClientFormDialog';
 import { InteractionFormDialog } from '@/components/InteractionFormDialog';
+import { UndoToast, useUndo } from '@/components/UndoToast';
 import { Client, ClientStatus, CLIENT_STATUS_LABELS } from '@/types/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +21,7 @@ const Clients = () => {
   const [interactionClient, setInteractionClient] = useState<Client | null>(null);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ClientStatus | 'all'>('all');
+  const { undoAction, showUndo, clearUndo } = useUndo();
 
   const followUpClients = getClientsNeedingFollowUp();
 
@@ -52,16 +55,37 @@ const Clients = () => {
 
   const handleSave = (data: Omit<Client, 'id' | 'createdAt' | 'updatedAt' | 'interactions'>) => {
     if (editClient) {
+      const oldData = { ...editClient };
       updateClient(editClient.id, data);
+      showUndo(`הלקוח ${data.name} עודכן`, () => {
+        updateClient(editClient.id, oldData);
+      });
     } else {
-      addClient(data);
+      const newClient = addClient(data);
+      showUndo(`לקוח חדש נוסף: ${data.name}`, () => {
+        deleteClient(newClient.id);
+      });
     }
     setEditClient(null);
+  };
+
+  const handleDelete = (id: string) => {
+    const clientToDelete = clients.find(c => c.id === id);
+    if (clientToDelete) {
+      deleteClient(id);
+      showUndo(`הלקוח ${clientToDelete.name} נמחק`, () => {
+        const { id: _, createdAt: __, updatedAt: ___, interactions: ____, ...data } = clientToDelete;
+        addClient(data);
+      });
+    }
   };
 
   const handleSaveInteraction = (data: { type: string; date: string; summary: string }) => {
     if (interactionClient) {
       addInteraction(interactionClient.id, data as any);
+      showUndo(`אינטראקציה נוספה ל-${interactionClient.name}`, () => {
+        // For simplicity, we won't support undo for interactions
+      });
     }
     setInteractionClient(null);
   };
@@ -189,7 +213,7 @@ const Clients = () => {
                 client={client}
                 index={i}
                 onEdit={handleEdit}
-                onDelete={deleteClient}
+                onDelete={handleDelete}
                 onStatusChange={(id, status) => updateClient(id, { status })}
                 onAddInteraction={handleAddInteraction}
               />
@@ -211,6 +235,18 @@ const Clients = () => {
         onClose={() => { setInteractionOpen(false); setInteractionClient(null); }}
         onSave={handleSaveInteraction}
       />
+
+      {/* Undo Toast */}
+      <AnimatePresence>
+        {undoAction && (
+          <UndoToast
+            key={undoAction.id}
+            message={undoAction.message}
+            onUndo={undoAction.undo}
+            onClose={clearUndo}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

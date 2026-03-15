@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { useEvents } from '@/hooks/useEvents';
 import { StatsCards } from '@/components/StatsCards';
 import { EventCard } from '@/components/EventCard';
 import { EventFormDialog } from '@/components/EventFormDialog';
+import { UndoToast, useUndo } from '@/components/UndoToast';
 import { EventOrder } from '@/types/event';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +18,7 @@ const Index = () => {
   const [editEvent, setEditEvent] = useState<EventOrder | null>(null);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+  const { undoAction, showUndo, clearUndo } = useUndo();
 
   const filtered = events
     .filter(e => {
@@ -41,11 +44,32 @@ const Index = () => {
 
   const handleSave = (data: Omit<EventOrder, 'id' | 'createdAt'>) => {
     if (editEvent) {
+      // Editing - save old data for undo
+      const oldData = { ...editEvent };
       updateEvent(editEvent.id, data);
+      showUndo(`האירוע של ${data.clientName} עודכן`, () => {
+        updateEvent(editEvent.id, oldData);
+      });
     } else {
-      addEvent(data);
+      // Adding new event - get the created event with its ID
+      const newEvent = addEvent(data);
+      showUndo(`אירוע חדש נוסף: ${data.clientName}`, () => {
+        deleteEvent(newEvent.id);
+      });
     }
     setEditEvent(null);
+  };
+
+  const handleDelete = (id: string) => {
+    const eventToDelete = events.find(e => e.id === id);
+    if (eventToDelete) {
+      deleteEvent(id);
+      showUndo(`האירוע של ${eventToDelete.clientName} נמחק`, () => {
+        // Re-add the event
+        const { id: _, createdAt: __, ...data } = eventToDelete;
+        addEvent(data);
+      });
+    }
   };
 
   return (
@@ -123,7 +147,7 @@ const Index = () => {
                 event={event}
                 index={i}
                 onEdit={handleEdit}
-                onDelete={deleteEvent}
+                onDelete={handleDelete}
                 onStatusChange={(id, status) => updateEvent(id, { invoiceStatus: status })}
               />
             ))}
@@ -137,6 +161,18 @@ const Index = () => {
         onSave={handleSave}
         editEvent={editEvent}
       />
+
+      {/* Undo Toast */}
+      <AnimatePresence>
+        {undoAction && (
+          <UndoToast
+            key={undoAction.id}
+            message={undoAction.message}
+            onUndo={undoAction.undo}
+            onClose={clearUndo}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

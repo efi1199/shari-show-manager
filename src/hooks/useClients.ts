@@ -75,7 +75,7 @@ function getSampleClients(): Client[] {
 export function useClients() {
   const [clients, setClients] = useState<Client[]>(loadClients);
 
-  const addClient = useCallback((client: Omit<Client, 'id' | 'createdAt' | 'updatedAt' | 'interactions'>) => {
+  const addClient = useCallback((client: Omit<Client, 'id' | 'createdAt' | 'updatedAt' | 'interactions'>): Client => {
     const now = new Date().toISOString();
     const newClient: Client = {
       ...client,

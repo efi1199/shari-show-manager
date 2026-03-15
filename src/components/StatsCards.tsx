@@ -18,7 +18,9 @@ export function StatsCards({ events }: StatsCardsProps) {
       const d = new Date(e.eventDate);
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     });
-    const monthlyRevenue = thisMonth.reduce((sum, e) => sum + e.price, 0);
+    // Only count revenue from PAID events
+    const paidThisMonth = thisMonth.filter(e => e.invoiceStatus === 'paid');
+    const monthlyRevenue = paidThisMonth.reduce((sum, e) => sum + e.price, 0);
     const pendingPayment = events.filter(e => e.invoiceStatus !== 'paid' && new Date(e.eventDate) <= now);
 
     return [
