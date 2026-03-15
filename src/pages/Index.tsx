@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useEvents } from '@/hooks/useEvents';
 import { StatsCards } from '@/components/StatsCards';
 import { EventCard } from '@/components/EventCard';
@@ -6,7 +7,7 @@ import { EventFormDialog } from '@/components/EventFormDialog';
 import { EventOrder } from '@/types/event';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Star } from 'lucide-react';
+import { Plus, Search, Star, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Index = () => {
@@ -61,10 +62,18 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">ניהול הזמנות והפעלות</p>
             </div>
           </div>
-          <Button onClick={() => { setEditEvent(null); setFormOpen(true); }} className="gap-2">
-            <Plus className="w-4 h-4" />
-            אירוע חדש
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/clients" className="gap-2">
+                <Users className="w-4 h-4" />
+                לקוחות
+              </Link>
+            </Button>
+            <Button onClick={() => { setEditEvent(null); setFormOpen(true); }} className="gap-2">
+              <Plus className="w-4 h-4" />
+              אירוע חדש
+            </Button>
+          </div>
         </div>
       </header>
 
